@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
@@ -56,7 +56,7 @@
       padding: 20px;
     }
 
-    /* Блок балансу */
+    /* Блок баланса */
     .balance-card {
       background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(20px);
@@ -93,7 +93,7 @@
       margin-left: 4px;
     }
 
-    /* Кнопка тапу */
+    /* Кнопка тапа */
     .tap-wrapper {
       position: relative;
       display: flex;
@@ -212,17 +212,17 @@
 </head>
 <body>
 
-<!-- Зірочки на фоні -->
+<!-- Звёздочки на фоне -->
 <div class="stars" id="stars"></div>
 
 <div class="container">
   <!-- Баланс -->
   <div class="balance-card">
-    <div class="balance-label">Мій баланс</div>
+    <div class="balance-label">Мой баланс</div>
     <div class="balance-amount" id="balance">0.00<span class="balance-currency">₴</span></div>
   </div>
 
-  <!-- Кнопка тапу -->
+  <!-- Кнопка тапа -->
   <div class="tap-wrapper">
     <div class="tap-ring"></div>
     <div class="tap-ring"></div>
@@ -237,7 +237,7 @@
   <div class="stats">
     <div class="stat-box">
       <div class="stat-value" id="taps">0</div>
-      <div class="stat-label">Тапів</div>
+      <div class="stat-label">Тапов</div>
     </div>
     <div class="stat-box">
       <div class="stat-value">+0.01₴</div>
@@ -245,11 +245,11 @@
     </div>
   </div>
 
-  <div class="motivation" id="motivText">Тапай та заробляй! 💪</div>
+  <div class="motivation" id="motivText">Тапай и зарабатывай! 💪</div>
 </div>
 
 <script>
-  // Ініціалізація Telegram WebApp
+  // Инициализация Telegram WebApp
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
@@ -257,7 +257,7 @@
     Telegram.WebApp.setBackgroundColor('#1a1a2e');
   }
 
-  // Зірочки на фоні
+  // Звёздочки на фоне
   const starsContainer = document.getElementById('stars');
   for (let i = 0; i < 60; i++) {
     const star = document.createElement('div');
@@ -279,16 +279,16 @@
   let taps = parseInt(localStorage.getItem('tapCount') || '0');
 
   const motivPhrases = [
-    'Ти краща! 🌟',
-    'Так тримати! 💪',
-    'Ще трохи! 🔥',
-    'Заробляєш як профі! 💼',
-    'Тапай сильніше! 😄',
-    'Ти зірка! ⭐',
-    'Нічого не зупинить тебе! 🚀',
-    'Красуня-трудяга! 💖',
-    'Рекорд близько! 🏆',
-    'Ще один тап! 😏',
+    'Ты лучшая! 🌟',
+    'Так держать! 💪',
+    'Ещё чуть-чуть! 🔥',
+    'Зарабатываешь как профи! 💼',
+    'Тапай сильнее! 😄',
+    'Ты звезда! ⭐',
+    'Ничто тебя не остановит! 🚀',
+    'Красотка-трудяга! 💖',
+    'Рекорд близко! 🏆',
+    'Ещё один тап! 😏',
   ];
 
   function updateUI() {
@@ -311,7 +311,7 @@
   function handleTap(e) {
     e.preventDefault();
 
-    // Отримати координати
+    // Получить координаты
     let clientX, clientY;
     if (e.touches && e.touches.length > 0) {
       clientX = e.touches[0].clientX;
@@ -321,7 +321,7 @@
       clientY = e.clientY;
     }
 
-    // Оновити дані
+    // Обновить данные
     balance = Math.round((balance + 0.01) * 100) / 100;
     taps++;
     localStorage.setItem('tapBalance', balance);
@@ -330,18 +330,18 @@
     updateUI();
     spawnFloat(clientX, clientY);
 
-    // Анімація балансу
+    // Анимация баланса
     balanceEl.classList.add('bump');
     setTimeout(() => balanceEl.classList.remove('bump'), 150);
 
-    // Вібрація
+    // Вибрация
     if (navigator.vibrate) navigator.vibrate(30);
     if (window.Telegram && Telegram.WebApp.HapticFeedback) {
       Telegram.WebApp.HapticFeedback.impactOccurred('light');
     }
 
-    // Мотивація кожні 10 тапів
-    if (taps % 10 === 0) {
+    // Мотивация каждые 10 тапов
+    if (taps % 20 === 0) {
       motivEl.textContent = motivPhrases[Math.floor(Math.random() * motivPhrases.length)];
     }
   }
