@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Тапалка 💰</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Фонові зірочки */
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite alternate;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.2; } 100% { opacity: 1; }
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      z-index: 1;
+      padding: 20px;
+    }
+
+    /* Блок балансу */
+    .balance-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 20px 48px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .balance-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .balance-amount {
+      font-size: 42px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 0 30px rgba(100, 220, 255, 0.6);
+      transition: transform 0.1s ease;
+    }
+
+    .balance-amount.bump {
+      transform: scale(1.15);
+    }
+
+    .balance-currency {
+      font-size: 22px;
+      color: rgba(255,255,255,0.7);
+      margin-left: 4px;
+    }
+
+    /* Кнопка тапу */
+    .tap-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tap-ring {
+      position: absolute;
+      width: 230px; height: 230px;
+      border-radius: 50%;
+      border: 3px solid rgba(100, 220, 255, 0.4);
+      animation: pulse-ring 2s ease-out infinite;
+    }
+
+    .tap-ring:nth-child(2) { animation-delay: 0.7s; }
+    .tap-ring:nth-child(3) { animation-delay: 1.4s; }
+
+    @keyframes pulse-ring {
+      0%   { transform: scale(1);   opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0;   }
+    }
+
+    .tap-btn {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: radial-gradient(circle at 35% 35%, #7ee8fa, #1e90ff 60%, #0a47a9);
+      box-shadow:
+        0 0 40px rgba(30, 144, 255, 0.6),
+        0 0 80px rgba(30, 144, 255, 0.3),
+        inset 0 -8px 16px rgba(0,0,0,0.3),
+        inset 0 4px 8px rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tap-btn:active {
+      transform: scale(0.91);
+      box-shadow:
+        0 0 20px rgba(30, 144, 255, 0.5),
+        0 0 40px rgba(30, 144, 255, 0.2),
+        inset 0 -4px 8px rgba(0,0,0,0.3),
+        inset 0 2px 4px rgba(255,255,255,0.3);
+    }
+
+    .tap-icon { font-size: 56px; line-height: 1; }
+    .tap-hint {
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    /* +0.01 анімація */
+    .float-text {
+      position: fixed;
+      font-size: 22px;
+      font-weight: 800;
+      color: #64ffda;
+      text-shadow: 0 0 10px rgba(100, 255, 218, 0.8);
+      pointer-events: none;
+      animation: float-up 1s ease-out forwards;
+      z-index: 999;
+    }
+
+    @keyframes float-up {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-90px) scale(1.3); }
+    }
+
+    /* Статистика */
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 12px 20px;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+
+    /* Мотиваційний текст */
+    .motivation {
+      font-size: 14px;
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      max-width: 280px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Зірочки на фоні -->
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <!-- Баланс -->
+  <div class="balance-card">
+    <div class="balance-label">Мій баланс</div>
+    <div class="balance-amount" id="balance">0.00<span class="balance-currency">₴</span></div>
+  </div>
+
+  <!-- Кнопка тапу -->
+  <div class="tap-wrapper">
+    <div class="tap-ring"></div>
+    <div class="tap-ring"></div>
+    <div class="tap-ring"></div>
+    <button class="tap-btn" id="tapBtn">
+      <span class="tap-icon">💰</span>
+      <span class="tap-hint">ТАП!</span>
+    </button>
+  </div>
+
+  <!-- Статистика -->
+  <div class="stats">
+    <div class="stat-box">
+      <div class="stat-value" id="taps">0</div>
+      <div class="stat-label">Тапів</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">+0.01₴</div>
+      <div class="stat-label">За тап</div>
+    </div>
+  </div>
+
+  <div class="motivation" id="motivText">Тапай та заробляй! 💪</div>
+</div>
+
+<script>
+  // Ініціалізація Telegram WebApp
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+    Telegram.WebApp.setHeaderColor('#1a1a2e');
+    Telegram.WebApp.setBackgroundColor('#1a1a2e');
+  }
+
+  // Зірочки на фоні
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 60; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    star.style.animationDuration = (2 + Math.random() * 3) + 's';
+    star.style.width = star.style.height = (1 + Math.random() * 2) + 'px';
+    starsContainer.appendChild(star);
+  }
+
+  const tapBtn = document.getElementById('tapBtn');
+  const balanceEl = document.getElementById('balance');
+  const tapsEl = document.getElementById('taps');
+  const motivEl = document.getElementById('motivText');
+
+  let balance = parseFloat(localStorage.getItem('tapBalance') || '0');
+  let taps = parseInt(localStorage.getItem('tapCount') || '0');
+
+  const motivPhrases = [
+    'Ти краща! 🌟',
+    'Так тримати! 💪',
+    'Ще трохи! 🔥',
+    'Заробляєш як профі! 💼',
+    'Тапай сильніше! 😄',
+    'Ти зірка! ⭐',
+    'Нічого не зупинить тебе! 🚀',
+    'Красуня-трудяга! 💖',
+    'Рекорд близько! 🏆',
+    'Ще один тап! 😏',
+  ];
+
+  function updateUI() {
+    balanceEl.innerHTML = balance.toFixed(2) + '<span class="balance-currency">₴</span>';
+    tapsEl.textContent = taps;
+  }
+
+  updateUI();
+
+  function spawnFloat(x, y) {
+    const el = document.createElement('div');
+    el.className = 'float-text';
+    el.textContent = '+0.01₴';
+    el.style.left = (x - 30) + 'px';
+    el.style.top = (y - 20) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+
+  function handleTap(e) {
+    e.preventDefault();
+
+    // Отримати координати
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    // Оновити дані
+    balance = Math.round((balance + 0.01) * 100) / 100;
+    taps++;
+    localStorage.setItem('tapBalance', balance);
+    localStorage.setItem('tapCount', taps);
+
+    updateUI();
+    spawnFloat(clientX, clientY);
+
+    // Анімація балансу
+    balanceEl.classList.add('bump');
+    setTimeout(() => balanceEl.classList.remove('bump'), 150);
+
+    // Вібрація
+    if (navigator.vibrate) navigator.vibrate(30);
+    if (window.Telegram && Telegram.WebApp.HapticFeedback) {
+      Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    }
+
+    // Мотивація кожні 10 тапів
+    if (taps % 10 === 0) {
+      motivEl.textContent = motivPhrases[Math.floor(Math.random() * motivPhrases.length)];
+    }
+  }
+
+  tapBtn.addEventListener('touchstart', handleTap, { passive: false });
+  tapBtn.addEventListener('click', handleTap);
+</script>
+</body>
+</html>
