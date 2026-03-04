@@ -245,7 +245,7 @@
     </div>
   </div>
 
-  <div class="motivation" id="motivText">Тапай и зарабатывай! 💪</div>
+  <div class="motivation" id="motivText">шими шими я шими я шими я ,бенг свалалала</div>
 </div>
 
 <script>
@@ -305,6 +305,8 @@
     'хух всё ,хватит с тебя ',
   ];
 
+  let motivIndex = 0;
+
   function updateUI() {
     balanceEl.innerHTML = balance.toFixed(2) + '<span class="balance-currency">₴</span>';
     tapsEl.textContent = taps;
@@ -356,7 +358,7 @@
 
     // Мотивация каждые 20 тапов
     if (taps % 20 === 0) {
-      motivEl.textContent = motivPhrases[Math.floor(Math.random() * motivPhrases.length)];
+      motivEl.textContent = motivPhrases[motivIndex++ % motivPhrases.length];
     }
   }
 
